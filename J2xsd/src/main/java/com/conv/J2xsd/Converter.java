@@ -2,6 +2,7 @@ package com.conv.J2xsd;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -14,16 +15,17 @@ import javax.xml.transform.TransformerException;
 
 import org.w3c.dom.Document;
 
+import com.ethlo.schematools.jsons2xsd.Jsons2Xsd;
+import com.ethlo.schematools.jsons2xsd.Jsons2Xsd.OuterWrapping;
 import com.ethlo.schematools.jsons2xsd.Jsons2XsdSingleFile;
 import com.ethlo.schematools.jsons2xsd.XmlUtil;
-import com.ethlo.schematools.jsons2xsd.Jsons2XsdSingleFile.OuterWrapping;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Converter {
 
 	
-	public void testConversionCMTS() throws IOException, TransformerException
+/*	public void testConversionCMTS() throws IOException, TransformerException
 	{
 
 			final Reader r = new InputStreamReader(getClass().getResourceAsStream("/depositAccountSchemaV1_1.json"));
@@ -34,7 +36,42 @@ public class Converter {
 			System.out.println(XmlUtil.asXmlString(doc.getDocumentElement()));
 
 	}
-	public String readCompleteFileAsString(File file){
+	*/
+	
+	public void testConversionMedium( String flePath) throws IOException, TransformerException
+	{
+		
+			FileInputStream fis = new FileInputStream(flePath);
+			Reader r = new InputStreamReader(fis);
+			final Document doc = Jsons2Xsd.convert(r, "http://dbs.bank.com", OuterWrapping.TYPE, "AccountUsers");
+			//System.out.println(XmlUtil.asXmlString(doc.getDocumentElement()));
+			String outputFilePath=flePath.replace(".json", ".xsd");
+			FileWriter fw=new FileWriter(outputFilePath);
+			fw.write(XmlUtil.asXmlString(doc.getDocumentElement()));
+			fw.close();
+			System.out.println("XSD file generated at location => "+outputFilePath);
+		
+	}
+	public void testConversionMedium( String flePath,String otherFile) throws IOException, TransformerException
+	{
+		try 
+		{
+			FileInputStream fis = new FileInputStream(flePath);
+			Reader r = new InputStreamReader(fis);
+			Reader def = new InputStreamReader( new FileInputStream(otherFile));
+			Document doc = Jsons2XsdSingleFile.convert(r, def, "http://cableapi.cablelabs.com/schemas/v1/CMTS", com.ethlo.schematools.jsons2xsd.Jsons2XsdSingleFile.OuterWrapping.ELEMENT, "CMTS");
+			//final Document doc = Jsons2Xsd.convert(r, "http://dbs.bank.com", OuterWrapping.TYPE, "AccountUsers");
+			System.out.println(XmlUtil.asXmlString(doc.getDocumentElement()));
+			String outputFilePath=flePath.replace(".json", ".xsd");
+			FileWriter fw=new FileWriter(outputFilePath);
+			fw.write(XmlUtil.asXmlString(doc.getDocumentElement()));
+			fw.close();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	/*public String readCompleteFileAsString(File file){
 		String fileContects ="";
 		try{
 		FileInputStream fis = new FileInputStream(file);
@@ -94,11 +131,11 @@ public class Converter {
 		final Pattern pattern = Pattern.compile(regex);
 		final Matcher matcher = pattern.matcher(contents);
 		return matcher;
-		/*while (matcher.find()) {
+		while (matcher.find()) {
 		    for (int i = 1; i <= matcher.groupCount(); i++) {
 		        System.out.println("Group " + i + ": " + matcher.group(i));
 		    }
-		}*/
+		}
 		
 		
 	}
@@ -173,6 +210,6 @@ public class Converter {
 		}
 		System.out.println("From source=>"+path+"=>"+output.toString());
 		return output;
-	}
+	}*/
 	
 }
